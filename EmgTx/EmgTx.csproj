@@ -46,6 +46,7 @@
     <Compile Include="CustomOracleTx\CustomOracleObjects.cs" />
     <Compile Include="CustomOracleTx\CustomOracleRx.cs" />
     <Compile Include="EmgTxCustom.cs" />
+    <Compile Include="SlideSceneHoox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
