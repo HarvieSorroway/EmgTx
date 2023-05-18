@@ -44,6 +44,7 @@
     <Compile Include="CustomOracleTx\CustomOracleObjects.cs" />
     <Compile Include="CustomOracleTx\CustomOracleRx.cs" />
     <Compile Include="EmgTxCustom.cs" />
+    <Compile Include="RoomChatTx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="BepInEx">
