@@ -39,14 +39,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomDeathPersistentSaveTx\CustomDeathPersistentSaveDataTx.cs" />
     <Compile Include="CustomDreamTx\CustomDreamHoox.cs" />
     <Compile Include="CustomDreamTx\CustomDreamRx.cs" />
     <Compile Include="CustomOracleTx\CustomOracleGraphicsHoox.cs" />
     <Compile Include="CustomOracleTx\CustomOracleHoox.cs" />
     <Compile Include="CustomOracleTx\CustomOracleObjects.cs" />
     <Compile Include="CustomOracleTx\CustomOracleRx.cs" />
+    <Compile Include="CustomPearlReader\CustomPearlReaderHoox.cs" />
+    <Compile Include="CustomPearlReader\CustomPearlReaderTx.cs" />
     <Compile Include="EmgTxCustom.cs" />
-    <Compile Include="SlideSceneHoox.cs" />
+    <Compile Include="RoomChatTx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -59,13 +62,13 @@
       <HintPath>..\..\MagneCat\link\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Mono.Cecil.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\includings\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod">
       <HintPath>..\..\MagneCat\link\MonoMod.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.RuntimeDetour.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\includings\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\MagneCat\link\MonoMod.Utils.dll</HintPath>
@@ -77,11 +80,8 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\MagneCat\link\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\MagneCat\link\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\includings\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\MagneCat\link\UnityEngine.CoreModule.dll</HintPath>
