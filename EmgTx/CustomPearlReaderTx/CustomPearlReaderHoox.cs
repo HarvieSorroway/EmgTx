@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 
 namespace CustomPearlReader
 {
+    public static class CustomPearlReaderRx
+    {
+        public static void ApplyTreatment(CustomPearlReaderTx treatment)
+        {
+            treatment.Init();
+            CustomPearlReaderHoox.HookOn();
+        }
+    }
+    
     public static class CustomPearlReaderHoox //try to learn something in PearlLexicon :P
     {
         public static bool SkipIntro = false;
@@ -39,12 +48,5 @@ namespace CustomPearlReader
         public delegate StoryGameSession orig_RainWorldGame_GetStorySession(RainWorldGame self);
         static BindingFlags propFlags = BindingFlags.Instance | BindingFlags.Public;
         static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.Public;
-
-
-        public static void ApplyTreatment(CustomPearlReaderTx treatment)
-        {
-            treatment.Init();
-            HookOn();
-        }
     }
 }
