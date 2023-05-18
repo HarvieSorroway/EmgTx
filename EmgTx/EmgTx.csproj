@@ -46,8 +46,8 @@
     <Compile Include="CustomOracleTx\CustomOracleHoox.cs" />
     <Compile Include="CustomOracleTx\CustomOracleObjects.cs" />
     <Compile Include="CustomOracleTx\CustomOracleRx.cs" />
-    <Compile Include="CustomPearlReader\CustomPearlReaderHoox.cs" />
-    <Compile Include="CustomPearlReader\CustomPearlReaderTx.cs" />
+    <Compile Include="CustomPearlReaderTx\CustomPearlReaderHoox.cs" />
+    <Compile Include="CustomPearlReaderTx\CustomPearlReaderTx.cs" />
     <Compile Include="EmgTxCustom.cs" />
     <Compile Include="RoomChatTx.cs" />
   </ItemGroup>
