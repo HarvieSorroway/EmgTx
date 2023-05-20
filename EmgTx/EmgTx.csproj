@@ -42,6 +42,7 @@
     <Compile Include="CustomDeathPersistentSaveTx\CustomDeathPersistentSaveDataTx.cs" />
     <Compile Include="CustomDreamTx\CustomDreamHoox.cs" />
     <Compile Include="CustomDreamTx\CustomDreamRx.cs" />
+    <Compile Include="CustomDreamTx\CustomSessionDreamTx.cs" />
     <Compile Include="CustomOracleTx\CustomOracleGraphicsHoox.cs" />
     <Compile Include="CustomOracleTx\CustomOracleHoox.cs" />
     <Compile Include="CustomOracleTx\CustomOracleObjects.cs" />

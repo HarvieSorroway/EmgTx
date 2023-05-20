@@ -12,7 +12,7 @@ using MoreSlugcats;
 using RWCustom;
 using UnityEngine;
 
-namespace EmgTx.CustomDreamTx
+namespace CustomDreamTx
 {
 
 
@@ -22,7 +22,7 @@ namespace EmgTx.CustomDreamTx
         /// 注册梦到游戏
         /// </summary>
         /// <param name="customDream">梦的参数类DreamNutils</param>
-        public static void RegisterDream(CustomDreamRx customDream)
+        public static void RegisterDream(CustomSessionDreamTx customDream)
         {
             OnModInit();
             dreams.Add(customDream);
@@ -32,7 +32,7 @@ namespace EmgTx.CustomDreamTx
         static bool isLoaded = false;
         static DreamSessionHoox()
         {
-            dreams = new List<CustomDreamRx>();
+            dreams = new List<CustomSessionDreamTx>();
         }
         public delegate SlugcatStats orig_slugcatStats(Player self);
 
@@ -514,9 +514,9 @@ namespace EmgTx.CustomDreamTx
 
         #endregion
 
-        static List<CustomDreamRx> dreams;
+        static List<CustomSessionDreamTx> dreams;
         static bool ma;
-        static CustomDreamRx activeCustomDream;
+        static CustomSessionDreamTx activeCustomDream;
 
         #endregion
     }
