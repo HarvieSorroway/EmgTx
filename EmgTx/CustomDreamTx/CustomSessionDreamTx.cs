@@ -126,7 +126,7 @@ namespace CustomDreamTx
             var survived = !(asDeath || asQuit) || ForceSave;
             var oldgame = game.manager.oldProcess as RainWorldGame;
             if (oldgame == null)
-                DreamSessionHoox.LogException(new Exception("[DreamGameSession] OldPrcess is not a RainWorldGame Class!"));
+                CustomDreamHoox.LogException(new Exception("[DreamGameSession] OldPrcess is not a RainWorldGame Class!"));
 
             //progression会在切换process时清空(PostSwitchMainProcess)，需重新赋值
             oldgame.rainWorld.progression.currentSaveState = oldgame.GetStorySession.saveState;
@@ -198,7 +198,7 @@ namespace CustomDreamTx
         {
             if (game.world.GetAbstractRoom(roomID).realizedRoom == null)
             {
-                DreamSessionHoox.LogException(new Exception("Can't spawn creature in non-activate room short cut"));
+                CustomDreamHoox.LogException(new Exception("Can't spawn creature in non-activate room short cut"));
                 return null;
             }
             int exits = game.world.GetAbstractRoom(roomID).exits;
@@ -261,7 +261,7 @@ namespace CustomDreamTx
         {
             if (game.world.GetAbstractRoom(roomID).realizedRoom == null)
             {
-                DreamSessionHoox.LogException(new Exception("Can't spawn player in non-activate room"));
+                CustomDreamHoox.LogException(new Exception("Can't spawn player in non-activate room"));
                 return null;
             }
             int exits = game.world.GetAbstractRoom(roomID).exits;
@@ -306,7 +306,7 @@ namespace CustomDreamTx
         {
             if (game.world.GetAbstractRoom(roomID).realizedRoom == null)
             {
-                DreamSessionHoox.LogException(new Exception("Can't spawn player in non-activate room"));
+                CustomDreamHoox.LogException(new Exception("Can't spawn player in non-activate room"));
                 return null;
             }
 
@@ -336,13 +336,13 @@ namespace CustomDreamTx
             if (!isRealized && game.cameras[0].room != null && game.cameras[0].room.shortCutsReady)
             {
                 PostFirstRoomRealized();
-                DreamSessionHoox.Log("Dream session room realized");
+                CustomDreamHoox.Log("Dream session room realized");
                 isRealized = true;
             }
             if (!isLoaded && game.world != null)
             {
                 PostWorldLoaded();
-                DreamSessionHoox.Log("Dream session world loaded");
+                CustomDreamHoox.Log("Dream session world loaded");
                 isLoaded = true;
             }
 

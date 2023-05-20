@@ -11,12 +11,13 @@ using MonoMod.RuntimeDetour;
 using MoreSlugcats;
 using RWCustom;
 using UnityEngine;
+using Microsoft.Win32;
+using static CustomDreamTx.CustomDreamRx;
+using Menu;
 
 namespace CustomDreamTx
 {
-
-
-    public static class DreamSessionHoox
+    public static class CustomDreamHoox
     {
         /// <summary>
         /// 注册梦到游戏
@@ -30,7 +31,7 @@ namespace CustomDreamTx
 
         #region Hook
         static bool isLoaded = false;
-        static DreamSessionHoox()
+        static CustomDreamHoox()
         {
             dreams = new List<CustomSessionDreamTx>();
         }
@@ -42,8 +43,6 @@ namespace CustomDreamTx
                 return self.abstractCreature.world.game.session.characterStats;
             return orig(self);
         }
-
-
 
         public static void Log(string message)
         {
@@ -81,7 +80,7 @@ namespace CustomDreamTx
 
                 Hook slugcatStateHook = new Hook(
                     typeof(Player).GetProperty("slugcatStats", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
-                    typeof(DreamSessionHoox).GetMethod("Player_slugcatStats_get", BindingFlags.Static | BindingFlags.Public));
+                    typeof(CustomDreamHoox).GetMethod("Player_slugcatStats_get", BindingFlags.Static | BindingFlags.Public));
                 isLoaded = true;
             }
         }
@@ -518,6 +517,238 @@ namespace CustomDreamTx
         static bool ma;
         static CustomSessionDreamTx activeCustomDream;
 
+        #endregion
+
+        #region NormalDreamHoox
+        static bool normalDreamRegisted;
+        public static void NormalDreamHooksOn()
+        {
+            if (normalDreamRegisted) return;
+            On.DreamsState.StaticEndOfCycleProgress += DreamsState_StaticEndOfCycleProgress;
+            On.Menu.DreamScreen.Update += DreamScreen_Update;
+            On.Menu.DreamScreen.SceneFromDream += DreamScreen_SceneFromDream;
+
+            On.OverWorld.LoadFirstWorld += OverWorld_LoadFirstWorld_NormalDream;
+            On.WorldLoader.CreatingWorld += WorldLoader_CreatingWorld_NormalDream;
+
+
+            On.RainWorldGame.GameOver += RainWorldGame_GameOver;
+            On.RainWorldGame.Win += RainWorldGame_Win_NormalDream;
+            On.RainWorldGame.SpawnPlayers_bool_bool_bool_bool_WorldCoordinate += RainWorldGame_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate;
+
+            On.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
+
+            On.StoryGameSession.TimeTick += StoryGameSession_TimeTick;
+
+            On.PlayerProgression.GetOrInitiateSaveState += PlayerProgression_GetOrInitiateSaveState;
+            On.PlayerProgression.SaveDeathPersistentDataOfCurrentState += PlayerProgression_SaveDeathPersistentDataOfCurrentState;
+
+            On.Menu.SleepAndDeathScreen.GetDataFromGame += SleepAndDeathScreen_GetDataFromGame;
+
+            normalDreamRegisted = true;
+        }
+
+        private static AbstractCreature RainWorldGame_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate(On.RainWorldGame.orig_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate orig, RainWorldGame self, bool player1, bool player2, bool player3, bool player4, WorldCoordinate location)
+        {
+            if (currentActivateNormalDream != null && currentActivateNormalDream.dreamStarted)
+            {
+                var param = currentActivateNormalDream.GetBuildDreamWorldParams();
+                if (param.overridePlayerPos != null)
+                {
+                    location.x = param.overridePlayerPos.Value.x;
+                    location.y = param.overridePlayerPos.Value.y;
+                }
+            }
+            return orig.Invoke(self, player1, player2, player3, player4, location);
+        }
+
+        private static void ProcessManager_PostSwitchMainProcess(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
+        {
+            orig.Invoke(self, ID);
+            if (currentActivateNormalDream != null && currentActivateNormalDream.dreamStarted && currentActivateNormalDream.dreamFinished)
+            {
+                currentActivateNormalDream.CleanUpThisDream();
+            }
+            if (currentActivateNormalDream != null && currentActivateNormalDream.dreamStarted && ID != ProcessManager.ProcessID.SleepScreen && currentActivateNormalDream.dreamStarted && ID != ProcessManager.ProcessID.Game)
+            {
+                currentActivateNormalDream.CleanUpThisDream();
+            }
+        }
+
+        private static void PlayerProgression_SaveDeathPersistentDataOfCurrentState(On.PlayerProgression.orig_SaveDeathPersistentDataOfCurrentState orig, PlayerProgression self, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
+        {
+            EmgTxCustom.Log(String.Format("Inside PlayerProgression_SaveDeathPersistentDataOfCurrentState, {0}", currentActivateNormalDream));
+            if (currentActivateNormalDream != null && currentActivateNormalDream.IsPerformDream)
+            {
+                EmgTxCustom.Log(currentActivateNormalDream.dreamStarted.ToString());
+                if (currentActivateNormalDream.dreamStarted)
+                {
+                    EmgTxCustom.Log(string.Format("PlayerProgression_SaveDeathPersistentDataOfCurrentState, block save : die {0}, quit {1}", saveAsIfPlayerDied, saveAsIfPlayerQuit));
+                    return;
+                }
+
+            }
+            orig.Invoke(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
+        }
+
+        private static void SleepAndDeathScreen_GetDataFromGame(On.Menu.SleepAndDeathScreen.orig_GetDataFromGame orig, Menu.SleepAndDeathScreen self, Menu.KarmaLadderScreen.SleepDeathScreenDataPackage package)
+        {
+            if (normalDreamDataBridge.sleepDeathScreenDataPackage != null)
+            {
+                package = normalDreamDataBridge.sleepDeathScreenDataPackage;
+                normalDreamDataBridge.sleepDeathScreenDataPackage = null;
+            }
+
+            orig.Invoke(self, package);
+        }
+
+        private static SaveState PlayerProgression_GetOrInitiateSaveState(On.PlayerProgression.orig_GetOrInitiateSaveState orig, PlayerProgression self, SlugcatStats.Name saveStateNumber, RainWorldGame game, ProcessManager.MenuSetup setup, bool saveAsDeathOrQuit)
+        {
+            EmgTxCustom.Log(String.Format("Inside PlayerProgression_GetOrInitiateSaveState, {0}", currentActivateNormalDream));
+            if (currentActivateNormalDream != null)
+            {
+                saveAsDeathOrQuit = !currentActivateNormalDream.dreamStarted;
+                EmgTxCustom.Log("Dream started , progression getOrInititateSaveState saveAsDeathOrQuit " + saveAsDeathOrQuit.ToString());
+            }
+            return orig.Invoke(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
+        }
+
+        private static void StoryGameSession_TimeTick(On.StoryGameSession.orig_TimeTick orig, StoryGameSession self, float dt)
+        {
+            if (currentActivateNormalDream != null && currentActivateNormalDream.dreamFinished)
+                return;
+            orig.Invoke(self, dt);
+        }
+
+        private static void RainWorldGame_Win_NormalDream(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
+        {
+            if (currentActivateNormalDream != null && currentActivateNormalDream.dreamStarted && currentActivateNormalDream.IsPerformDream)
+            {
+                currentActivateNormalDream.EndDream(self);
+                return;
+            }
+            orig.Invoke(self, malnourished);
+        }
+
+        private static void RainWorldGame_GameOver(On.RainWorldGame.orig_GameOver orig, RainWorldGame self, Creature.Grasp dependentOnGrasp)
+        {
+            if (currentActivateNormalDream != null && currentActivateNormalDream.dreamStarted && currentActivateNormalDream.IsPerformDream)
+            {
+                currentActivateNormalDream.EndDream(self);
+                return;
+            }
+            orig.Invoke(self, dependentOnGrasp);
+        }
+
+        #region WorldLoader & OverWorld
+        private static void OverWorld_LoadFirstWorld_NormalDream(On.OverWorld.orig_LoadFirstWorld orig, OverWorld self)
+        {
+            if (currentActivateNormalDream != null && currentActivateNormalDream.IsPerformDream)
+            {
+                var param = currentActivateNormalDream.GetBuildDreamWorldParams();
+
+                string room = param.firstRoom;
+                string region = room.Split('_').First().ToUpper();
+
+                self.game.startingRoom = room;
+                self.LoadWorld(region, self.PlayerCharacterNumber, param.singleRoomWorld);
+                self.FIRSTROOM = room;
+
+                EmgTxCustom.Log("OverWorld load room");
+                return;
+            }
+            orig.Invoke(self);
+        }
+        private static void WorldLoader_CreatingWorld_NormalDream(On.WorldLoader.orig_CreatingWorld orig, WorldLoader self)
+        {
+            if (self.game != null && self.game.session is StoryGameSession && currentActivateNormalDream != null && currentActivateNormalDream.IsPerformDream)
+            {
+                self.world.spawners = self.spawners.ToArray();
+                List<World.Lineage> list = new List<World.Lineage>();
+                for (int i = 0; i < self.spawners.Count; i++)
+                {
+                    if (self.spawners[i] is World.Lineage)
+                    {
+                        list.Add(self.spawners[i] as World.Lineage);
+                    }
+                }
+                self.world.lineages = list.ToArray();
+                if (self.loadContext == WorldLoader.LoadingContext.FASTTRAVEL || self.loadContext == WorldLoader.LoadingContext.MAPMERGE)
+                {
+                    self.world.LoadWorldForFastTravel(self.playerCharacter, self.abstractRooms, self.swarmRoomsList.ToArray(), self.sheltersList.ToArray(), self.gatesList.ToArray());
+                }
+                else
+                {
+                    self.world.LoadWorld(self.playerCharacter, self.abstractRooms, self.swarmRoomsList.ToArray(), self.sheltersList.ToArray(), self.gatesList.ToArray());
+                    self.creatureStats[0] = (float)self.world.NumberOfRooms;
+                    self.creatureStats[1] = (float)self.world.spawners.Length;
+                }
+                self.fliesMigrationBlockages = new int[self.tempBatBlocks.Count, 2];
+                for (int j = 0; j < self.tempBatBlocks.Count; j++)
+                {
+                    int num = (self.world.GetAbstractRoom(self.tempBatBlocks[j].fromRoom) == null) ? -1 : self.world.GetAbstractRoom(self.tempBatBlocks[j].fromRoom).index;
+                    int num2 = (self.world.GetAbstractRoom(self.tempBatBlocks[j].destRoom) == null) ? -1 : self.world.GetAbstractRoom(self.tempBatBlocks[j].destRoom).index;
+                    self.fliesMigrationBlockages[j, 0] = num;
+                    self.fliesMigrationBlockages[j, 1] = num2;
+                }
+
+                return;
+            }
+            orig.Invoke(self);
+        }
+        #endregion
+
+        #region DreamScreen
+        private static void DreamScreen_Update(On.Menu.DreamScreen.orig_Update orig, Menu.DreamScreen self)
+        {
+            orig.Invoke(self);
+            if (self.manager.fadeToBlack > 0.9f && currentActivateNormalDream != null && currentActivateNormalDream.IsPerformDream)
+            {
+                self.manager.fadeToBlack = 1f;
+                self.scene.RemoveSprites();
+
+                currentActivateNormalDream.dreamStarted = true;
+                normalDreamDataBridge.sleepDeathScreenDataPackage = self.fromGameDataPackage;
+                self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
+                self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
+            }
+        }
+
+        private static MenuScene.SceneID DreamScreen_SceneFromDream(On.Menu.DreamScreen.orig_SceneFromDream orig, DreamScreen self, DreamsState.DreamID dreamID)
+        {
+            MenuScene.SceneID sceneID = orig.Invoke(self, dreamID);
+            if (sceneID == MenuScene.SceneID.Empty && currentActivateNormalDream != null && !currentActivateNormalDream.IsPerformDream)
+            {
+                sceneID = currentActivateNormalDream.SceneFromDream(dreamID);
+                currentActivateNormalDream.dreamStarted = true;
+                currentActivateNormalDream.dreamFinished = true;
+            }
+            return sceneID;
+        }
+
+        private static void DreamsState_StaticEndOfCycleProgress(On.DreamsState.orig_StaticEndOfCycleProgress orig, SaveState saveState, string currentRegion, string denPosition, ref int cyclesSinceLastDream, ref int cyclesSinceLastFamilyDream, ref int cyclesSinceLastGuideDream, ref int inGWOrSHCounter, ref DreamsState.DreamID upcomingDream, ref DreamsState.DreamID eventDream, ref bool everSleptInSB, ref bool everSleptInSB_S01, ref bool guideHasShownHimselfToPlayer, ref int guideThread, ref bool guideHasShownMoonThisRound, ref int familyThread)
+        {
+            orig.Invoke(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
+            if (normalDreamTreatments.Count > 0)
+            {
+                foreach (var dream in normalDreamTreatments)
+                {
+                    if (dream.focusSlugcat != saveState.saveStateNumber)
+                    {
+                        EmgTxCustom.Log(string.Format("{0} not focus on this slugcat : {1}, skip decide dream", dream, saveState.saveStateNumber));
+                        continue;
+                    }
+
+                    dream.DecideDreamID(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
+                    if (upcomingDream != null)
+                    {
+                        dream.ActivateThisDream(upcomingDream);
+                        break;
+                    }
+                }
+            }
+        }
+        #endregion
         #endregion
     }
 }
