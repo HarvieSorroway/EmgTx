@@ -19,22 +19,10 @@ namespace CustomDreamTx
 {
     public static class CustomDreamHoox
     {
-        /// <summary>
-        /// 注册梦到游戏
-        /// </summary>
-        /// <param name="customDream">梦的参数类DreamNutils</param>
-        public static void RegisterDream(CustomSessionDreamTx customDream)
-        {
-            OnModInit();
-            dreams.Add(customDream);
-        }
+        
 
         #region Hook
         static bool isLoaded = false;
-        static CustomDreamHoox()
-        {
-            dreams = new List<CustomSessionDreamTx>();
-        }
         public delegate SlugcatStats orig_slugcatStats(Player self);
 
         public static SlugcatStats Player_slugcatStats_get(orig_slugcatStats orig, Player self)
@@ -44,17 +32,19 @@ namespace CustomDreamTx
             return orig(self);
         }
 
+
+
         public static void Log(string message)
         {
-            Debug.Log("[CustomDreamRx] " + message);
+            Debug.Log("[DreamNutils] " + message);
         }
         public static void LogException(Exception e)
         {
-            Debug.LogError("[CustomDreamRx] ERROR!");
+            Debug.LogError("[DreamNutils] ERROR!");
             Debug.LogException(e);
         }
 
-        static void OnModInit()
+        public static void OnModInit()
         {
             if (!isLoaded)
             {
@@ -116,7 +106,7 @@ namespace CustomDreamTx
         private static void WorldLoader_CreatingWorld(On.WorldLoader.orig_CreatingWorld orig, WorldLoader self)
         {
             orig(self);
-            if (self.game.session is DreamGameSession dream && dream.owner.AllowDefaultSpawn)
+            if (self.game != null && self.game.session is DreamGameSession dream && dream.owner.AllowDefaultSpawn)
                 self.GeneratePopulation();
             Debug.Log("[Nutils] End Generate population");
         }
@@ -234,7 +224,7 @@ namespace CustomDreamTx
         private static void WorldLoader_ctor_RainWorldGame_Name_bool_string_Region_SetupValues(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self, RainWorldGame game, SlugcatStats.Name playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
 
-            if (game.session is DreamGameSession dream1 && dream1.owner.OverrideDefaultSpawn)
+            if (game != null && game.session is DreamGameSession dream1 && dream1.owner.OverrideDefaultSpawn)
                 orig(self, game, dream1.owner.DefaultSpawnName, singleRoomWorld, worldName, region, setupValues);
             orig(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
         }
@@ -252,34 +242,6 @@ namespace CustomDreamTx
                 self.AddPart(new KarmaMeter(self, self.fContainers[1], new IntVector2((self.owner as Player).Karma, (self.owner as Player).KarmaCap), (self.owner as Player).KarmaIsReinforced));
                 self.AddPart(new FoodMeter(self, (self.owner as Player).slugcatStats.maxFood, (self.owner as Player).slugcatStats.foodToHibernate, null, 0));
                 self.AddPart(new RainMeter(self, self.fContainers[1]));
-                if (ModManager.MSC)
-                {
-                    self.AddPart(new AmmoMeter(self, null, self.fContainers[1]));
-                    self.AddPart(new HypothermiaMeter(self, self.fContainers[1]));
-                    if ((self.owner as Player).SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Gourmand)
-                    {
-                        self.AddPart(new GourmandMeter(self, self.fContainers[1]));
-                    }
-                }
-                if (ModManager.MMF && MMF.cfgBreathTimeVisualIndicator.Value)
-                {
-                    self.AddPart(new BreathMeter(self, self.fContainers[1]));
-                    if (ModManager.CoopAvailable && cam.room.game.session != null)
-                    {
-                        for (int i = 1; i < cam.room.game.session.Players.Count; i++)
-                        {
-                            self.AddPart(new BreathMeter(self, self.fContainers[1], cam.room.game.session.Players[i]));
-                        }
-                    }
-                }
-                if (ModManager.MMF && MMF.cfgThreatMusicPulse.Value)
-                {
-                    self.AddPart(new ThreatPulser(self, self.fContainers[1]));
-                }
-                if (ModManager.MMF && MMF.cfgSpeedrunTimer.Value)
-                {
-                    self.AddPart(new SpeedRunTimer(self, null, self.fContainers[1]));
-                }
                 if (cam.room.abstractRoom.shelter)
                 {
                     self.karmaMeter.fade = 1f;
@@ -434,12 +396,12 @@ namespace CustomDreamTx
                 {
                     if (self.manager.oldProcess is RainWorldGame game)
                     {
-                        if (activeCustomDream != null)
+                        if (activeDream != null)
                         {
 
-                            self.session = activeCustomDream.GetSession(self, game.session.characterStats.name);
-                            self.rainWorld.setup.worldCreaturesSpawn = activeCustomDream.AllowDefaultSpawn;
-                            activeCustomDream = null;
+                            self.session = activeDream.GetSession(self, game.session.characterStats.name);
+                            self.rainWorld.setup.worldCreaturesSpawn = activeDream.AllowDefaultSpawn;
+                            activeDream = null;
                         }
                     }
                 });
@@ -450,17 +412,17 @@ namespace CustomDreamTx
         {
             if (!(self.session is DreamGameSession))
             {
-                foreach (var dream in dreams)
+                foreach (var dream in sessionDreamTreatments)
                 {
                     if (dream.HasDreamThisCycle(self, malnourished))
                     {
-                        activeCustomDream = dream;
+                        activeDream = dream;
                         break;
                     }
                 }
-                if (activeCustomDream != null)
+                if (activeDream != null)
                 {
-                    Log("Try entering customDream");
+                    Log("Try entering dream");
                     self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
                     ma = malnourished;
                     self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
@@ -473,7 +435,7 @@ namespace CustomDreamTx
 
         private static bool MultiplayerUnlocks_IsLevelUnlocked(On.MultiplayerUnlocks.orig_IsLevelUnlocked orig, MultiplayerUnlocks self, string levelName)
         {
-            foreach (var data in dreams)
+            foreach (var data in sessionDreamTreatments)
             {
                 if (data.IsSingleWorld && data.HiddenRoomInArena && data.FirstRoom.ToLower() == levelName.ToLower())
                     return false;
@@ -513,12 +475,9 @@ namespace CustomDreamTx
 
         #endregion
 
-        static List<CustomSessionDreamTx> dreams;
-        static bool ma;
-        static CustomSessionDreamTx activeCustomDream;
+        
 
         #endregion
-
         #region NormalDreamHoox
         static bool normalDreamRegisted;
         public static void NormalDreamHooksOn()

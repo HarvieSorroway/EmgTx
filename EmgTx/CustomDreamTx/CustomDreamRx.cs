@@ -40,5 +40,20 @@ namespace CustomDreamTx
             CustomDreamHoox.NormalDreamHooksOn();
         }
         #endregion
+
+        /// <summary>
+        /// 注册梦到游戏
+        /// </summary>
+        /// <param name="dream">梦的参数类DreamNutils</param>
+        public static void ApplyTreatment(CustomSessionDreamTx dream)
+        {
+            CustomDreamHoox.OnModInit();
+            sessionDreamTreatments.Add(dream);
+        }
+
+        public static List<CustomSessionDreamTx> sessionDreamTreatments = new List<CustomSessionDreamTx>();
+        public static bool ma;
+        public static CustomSessionDreamTx activeDream;
+
     }
 }

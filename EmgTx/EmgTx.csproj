@@ -51,6 +51,9 @@
     <Compile Include="CustomPearlReaderTx\CustomPearlReaderHoox.cs" />
     <Compile Include="CustomPearlReaderTx\CustomPearlReaderTx.cs" />
     <Compile Include="EmgTxCustom.cs" />
+    <Compile Include="ModFixerTx\ModFixerHoox.cs" />
+    <Compile Include="ModFixerTx\ModFixerRx.cs" />
+    <Compile Include="ModFixerTx\ModFixerTx.cs" />
     <Compile Include="RoomChatTx.cs" />
   </ItemGroup>
   <ItemGroup>
