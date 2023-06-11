@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +15,20 @@ using UnityEngine;
 [BepInPlugin("emgtx", "EmgTx", "1.0.0")]
 public class EmgTxCustom
 {
+    public static void Log(object obj)
+    {
+        Log($"{obj}");
+    }
+
     public static void Log(string msg)
     {
-        Debug.Log("[EmgTx]" + msg);
+        string header = Assembly.GetCallingAssembly().FullName.Split(',')[0];
+        Debug.Log($"[EmgTx=>{header}]{msg}");
     }
 
     public static void Log(string pattern,params object[] vars)
     {
-        Debug.Log("[EmgTx]" + string.Format(pattern, vars));
+        string header = Assembly.GetCallingAssembly().FullName.Split(',')[0];
+        Debug.Log($"[EmgTx=>{header}]" + string.Format(pattern, vars));
     }
 }

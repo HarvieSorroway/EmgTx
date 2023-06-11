@@ -71,7 +71,7 @@ public class RoomChatTx : UpdatableAndDeletable
         if (room.game.cameras[0].hud.textPrompt == null)
             room.game.cameras[0].hud.AddPart(new TextPrompt(room.game.cameras[0].hud));
 
-        room.game.cameras[0].hud.textPrompt.AddMessage(Translate(textPrompt), 0, textPromptTime, true, true);
+        room.game.cameras[0].hud.textPrompt.AddMessage(Translate(textPrompt), textPromptWait, textPromptTime, true, true);
         textPrompted = true;
     }
 
