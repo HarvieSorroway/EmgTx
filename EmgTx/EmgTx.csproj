@@ -68,13 +68,13 @@
       <HintPath>..\..\MagneCat\link\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>..\..\DistanceLand\includings\Mono.Cecil.dll</HintPath>
+      <HintPath>..\..\Nutils\Nutils\bin\Debug\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod">
       <HintPath>..\..\MagneCat\link\MonoMod.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>..\..\DistanceLand\includings\MonoMod.RuntimeDetour.dll</HintPath>
+      <HintPath>..\..\DistancedLand\includings\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\MagneCat\link\MonoMod.Utils.dll</HintPath>
@@ -87,7 +87,7 @@
       <HintPath>..\..\MagneCat\link\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\DistanceLand\includings\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>..\..\DistancedLand\includings\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\MagneCat\link\UnityEngine.CoreModule.dll</HintPath>
