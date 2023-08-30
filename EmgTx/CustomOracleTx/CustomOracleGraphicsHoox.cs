@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace CustomOracleTx
 {
-    public class OracleGraphicsModuleHooks
+    internal class OracleGraphicsModuleHooks
     {
         public static void HookOn()
         {

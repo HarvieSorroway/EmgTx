@@ -17,7 +17,7 @@ using Menu;
 
 namespace CustomDreamTx
 {
-    public static class CustomDreamHoox
+    internal static class CustomDreamHoox
     {
         
 

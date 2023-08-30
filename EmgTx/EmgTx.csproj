@@ -1,62 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4546CFBC-FEC3-434B-B2E1-5FC4F5923483}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <RootNamespace>EmgTx</RootNamespace>
-    <AssemblyName>EmgTx</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CustomDeathPersistentSaveTx\CustomDeathPersistentSaveDataTx.cs" />
-    <Compile Include="CustomDreamTx\CustomDreamHoox.cs" />
-    <Compile Include="CustomDreamTx\CustomDreamRx.cs" />
-    <Compile Include="CustomDreamTx\CustomNormalDreamTx.cs" />
-    <Compile Include="CustomDreamTx\CustomSessionDreamTx.cs" />
-    <Compile Include="CustomOracleTx\CustomOracleGraphicsHoox.cs" />
-    <Compile Include="CustomOracleTx\CustomOracleHoox.cs" />
-    <Compile Include="CustomOracleTx\CustomOracleObjects.cs" />
-    <Compile Include="CustomOracleTx\CustomOracleRx.cs" />
-    <Compile Include="CustomPearlReaderTx\CustomPearlReaderHoox.cs" />
-    <Compile Include="CustomPearlReaderTx\CustomPearlReaderTx.cs" />
-    <Compile Include="EmgTxCustom.cs" />
-    <Compile Include="CustomEdibleTx.cs" />
-    <Compile Include="ModFixerTx\ModFixerHoox.cs" />
-    <Compile Include="ModFixerTx\ModFixerRx.cs" />
-    <Compile Include="ModFixerTx\ModFixerTx.cs" />
-    <Compile Include="RoomChatTx.cs" />
-  </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\MagneCat\link\0Harmony.dll</HintPath>
@@ -82,7 +32,6 @@
     <Reference Include="PUBLIC-Assembly-CSharp">
       <HintPath>..\..\MagneCat\link\PUBLIC-Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\MagneCat\link\UnityEngine.dll</HintPath>
     </Reference>
@@ -96,6 +45,7 @@
       <HintPath>..\..\MagneCat\link\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Remove="SlideSceneHoox.cs" />
+  </ItemGroup>
 </Project>

@@ -4,7 +4,6 @@ using System.Linq;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -12,7 +11,7 @@ using System.Reflection;
 
 namespace CustomOracleTx
 {
-    public static class OracleHoox
+    internal static class OracleHoox
     {
         static bool hookOn = false;
         public static void HookOn()
