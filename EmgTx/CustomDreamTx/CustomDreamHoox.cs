@@ -483,6 +483,10 @@ namespace CustomDreamTx
         public static void NormalDreamHooksOn()
         {
             if (normalDreamRegisted) return;
+
+            DreamFix.InitIL();
+            DreamFix.Init();
+
             On.DreamsState.StaticEndOfCycleProgress += DreamsState_StaticEndOfCycleProgress;
             On.Menu.DreamScreen.Update += DreamScreen_Update;
             On.Menu.DreamScreen.SceneFromDream += DreamScreen_SceneFromDream;
