@@ -7,7 +7,6 @@ using RWCustom;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using MonoMod;
-using HunterExpansion.CustomOracle;
 using Menu;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;

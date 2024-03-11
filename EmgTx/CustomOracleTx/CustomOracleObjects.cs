@@ -332,16 +332,23 @@ namespace CustomOracleTx
     {
         public static List<CustomOraclePearlTx> treatments = new List<CustomOraclePearlTx>();
         public static Dictionary<AbstractPhysicalObject.AbstractObjectType, CustomOraclePearlTx> typeToTreatment = new Dictionary<AbstractPhysicalObject.AbstractObjectType, CustomOraclePearlTx>();
-        public static Dictionary<Conversation.ID, CustomOraclePearlTx> idToTreatment = new Dictionary<Conversation.ID, CustomOraclePearlTx>();
+        //public static Dictionary<Conversation.ID, CustomOraclePearlTx> idToTreatment = new Dictionary<Conversation.ID, CustomOraclePearlTx>();
         public static Dictionary<DataPearl.AbstractDataPearl.DataPearlType, CustomOraclePearlTx> pearlTypeToTreatment = new Dictionary<DataPearl.AbstractDataPearl.DataPearlType, CustomOraclePearlTx>();
 
         public static void ApplyTreatment(CustomOraclePearlTx pearlTreatment)
         {
-            if (treatments.Contains(pearlTreatment)) return;
-            treatments.Add(pearlTreatment);
-            typeToTreatment.Add(pearlTreatment.pearlObjectType, pearlTreatment);
-            idToTreatment.Add(pearlTreatment.pearlConvID, pearlTreatment);
-            pearlTypeToTreatment.Add(pearlTreatment.dataPearlType, pearlTreatment);
+            try
+            {
+                if (treatments.Contains(pearlTreatment)) return;
+                treatments.Add(pearlTreatment);
+                typeToTreatment.Add(pearlTreatment.pearlObjectType, pearlTreatment);
+                pearlTypeToTreatment.Add(pearlTreatment.dataPearlType, pearlTreatment);
+            }
+            catch(Exception ex)
+            {
+                Debug.LogException(ex);
+                EmgTxCustom.Log($"Exception when apply treatment for : {pearlTreatment.pearlObjectType}-{pearlTreatment.pearlConvID}-{pearlTreatment.dataPearlType}");
+            }
 
             CustomOraclePearlHoox.HookOn();
         }
@@ -442,12 +449,15 @@ namespace CustomOracleTx
         private static void MoonConversation_AddEvents(On.SLOracleBehaviorHasMark.MoonConversation.orig_AddEvents orig, SLOracleBehaviorHasMark.MoonConversation self)
         {
             orig.Invoke(self);
-            if (CustomOraclePearlRx.idToTreatment.TryGetValue(self.id, out var treatment))
+            foreach(var treatment in CustomOraclePearlRx.treatments)
             {
-                treatment.LoadSLPearlConversation(self, self.currentSaveFile, true, (self.myBehavior is SLOracleBehaviorHasMark && (self.myBehavior as SLOracleBehaviorHasMark).holdingObject != null) ? (self.myBehavior as SLOracleBehaviorHasMark).holdingObject.abstractPhysicalObject.ID.RandomSeed : Random.Range(0, 100000));
-            }
-            else
-                EmgTxCustom.Log($"Cant get registry from convID {self.id}");
+                if(treatment.pearlConvID == self.id)
+                {
+                    treatment.LoadSLPearlConversation(self, self.currentSaveFile, true, (self.myBehavior is SLOracleBehaviorHasMark && (self.myBehavior as SLOracleBehaviorHasMark).holdingObject != null) ? (self.myBehavior as SLOracleBehaviorHasMark).holdingObject.abstractPhysicalObject.ID.RandomSeed : Random.Range(0, 100000));
+                    EmgTxCustom.Log($"Custom oracle pearl conversation loaded : {treatment.pearlObjectType}-{treatment.pearlConvID}-{treatment.dataPearlType}");
+                    return;
+                }
+            }   
         }
 
         private static void DataPearl_ApplyPalette(On.DataPearl.orig_ApplyPalette orig, DataPearl self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
