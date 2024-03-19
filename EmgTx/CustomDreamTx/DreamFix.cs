@@ -26,7 +26,7 @@ namespace CustomDreamTx
         public static void Init()
         {
             //这是在修Emgtx的bug，解决与速通计时器的冲突
-            On.MoreSlugcats.SpeedRunTimer.Update += SpeedRunTimer_Update;
+            //On.MoreSlugcats.SpeedRunTimer.Update += SpeedRunTimer_Update;
         }
 
         #region IL Hooks
@@ -99,6 +99,7 @@ namespace CustomDreamTx
             }
         }
         #endregion
+        /*
         public static void SpeedRunTimer_Update(On.MoreSlugcats.SpeedRunTimer.orig_Update orig, SpeedRunTimer self)
         {
             if (self.ThePlayer().abstractCreature.world.game.GetStorySession.playerSessionRecords[0] == null)
@@ -106,6 +107,6 @@ namespace CustomDreamTx
                 return;
             }
             orig(self);
-        }
+        }*/
     }
 }

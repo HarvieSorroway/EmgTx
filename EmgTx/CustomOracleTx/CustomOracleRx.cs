@@ -992,10 +992,10 @@ namespace CustomOracleTx
                 return float.MaxValue;
             }
             float num = Mathf.Abs(Vector2.Distance(tryPos, player.DangerPos) - ((movementBehavior == CustomMovementBehavior.Talk) ? 250f : 400f));
-            num -= (float)Custom.IntClamp(oracle.room.aimap.getAItile(tryPos).terrainProximity, 0, 8) * 10f;
+            num -= (float)Custom.IntClamp(oracle.room.aimap.getTerrainProximity(tryPos), 0, 8) * 10f;
             if (movementBehavior == CustomMovementBehavior.ShowMedia)
             {
-                num += (float)(Custom.IntClamp(oracle.room.aimap.getAItile(tryPos).terrainProximity, 8, 16) - 8) * 10f;
+                num += (float)(Custom.IntClamp(oracle.room.aimap.getTerrainProximity(tryPos), 8, 16) - 8) * 10f;
             }
             return num;
         }
@@ -1114,7 +1114,7 @@ namespace CustomOracleTx
                 {
                     lookPoint = player.DangerPos;
                     Vector2 vector = new Vector2(Random.value * oracle.room.PixelWidth, Random.value * oracle.room.PixelHeight);
-                    if (!oracle.room.GetTile(vector).Solid && oracle.room.aimap.getAItile(vector).terrainProximity > 2 && Vector2.Distance(vector, player.DangerPos) > Vector2.Distance(nextPos, player.DangerPos) + 100f)
+                    if (!oracle.room.GetTile(vector).Solid && oracle.room.aimap.getTerrainProximity(vector) > 2 && Vector2.Distance(vector, player.DangerPos) > Vector2.Distance(nextPos, player.DangerPos) + 100f)
                     {
                         SetNewDestination(vector);
                     }
@@ -1129,13 +1129,13 @@ namespace CustomOracleTx
                 else
                 {
                     lookPoint = player.DangerPos;
-                    if (investigateAngle < -90f || investigateAngle > 90f || oracle.room.aimap.getAItile(nextPos).terrainProximity < 2f)
+                    if (investigateAngle < -90f || investigateAngle > 90f || oracle.room.aimap.getTerrainProximity(nextPos) < 2f)
                     {
                         investigateAngle = Mathf.Lerp(-70f, 70f, Random.value);
                         invstAngSpeed = Mathf.Lerp(0.4f, 0.8f, Random.value) * ((Random.value < 0.5f) ? (-1f) : 1f);
                     }
                     Vector2 vector = player.DangerPos + Custom.DegToVec(investigateAngle) * 150f;
-                    if (oracle.room.aimap.getAItile(vector).terrainProximity >= 2f)
+                    if (oracle.room.aimap.getTerrainProximity(vector) >= 2f)
                     {
                         if (pathProgression > 0.9f)
                         {
